@@ -23,7 +23,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { ApiResponse, MeetingCategoryDto, AuthUser } from '@mexagenda/shared';
+import type { ApiResponse, MeetingCategoryDto, AuthUser } from '../../_shared';
 
 @ApiTags('Categorías y Taxonomía de Reuniones')
 @Controller('meeting-categories')

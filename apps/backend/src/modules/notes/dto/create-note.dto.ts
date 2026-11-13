@@ -9,7 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { NoteCategory, NoteType, NoteVisibility } from '@mexagenda/shared';
+import { NoteCategory, NoteType, NoteVisibility } from '../../../_shared';
 
 export class CreateNoteDto {
   @ApiProperty({ description: 'Título institucional de la anotación', maxLength: 250 })

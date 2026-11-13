@@ -19,7 +19,7 @@ import type {
   AgreementsTrackingDto,
   SessionGovernanceDto,
   PersonalConsoleDto,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { ReportsService } from './reports.service';
 import { QueryReportsDto } from './dto/query-reports.dto';
 import { ExportReportsDto } from './dto/export-reports.dto';

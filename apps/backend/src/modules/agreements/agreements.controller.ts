@@ -43,7 +43,7 @@ import type {
   AgreementReportsDto,
   PaginatedResponse,
   AuthUser,
-} from '@mexagenda/shared';
+} from '../../_shared';
 
 @ApiTags('Gestión, Asignación y Seguimiento de Acuerdos Institucionales')
 @Controller('agreements')

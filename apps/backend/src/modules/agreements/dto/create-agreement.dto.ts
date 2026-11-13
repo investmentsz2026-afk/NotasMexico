@@ -9,7 +9,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { AgreementPriority } from '@mexagenda/shared';
+import { AgreementPriority } from '../../../_shared';
 
 export class CreateAgreementDto {
   @ApiProperty({

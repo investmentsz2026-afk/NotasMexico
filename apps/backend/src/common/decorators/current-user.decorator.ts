@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { AuthUser } from '@mexagenda/shared';
+import { AuthUser } from '../../_shared';
 
 export const CurrentUser = createParamDecorator(
   (data: keyof AuthUser | undefined, ctx: ExecutionContext) => {

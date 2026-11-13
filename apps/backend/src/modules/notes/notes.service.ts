@@ -22,7 +22,7 @@ import {
   PersonalNoteVersionDto,
   PaginatedResponse,
   AuditOutcome,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { Prisma } from '@prisma/client';
 
 @Injectable()

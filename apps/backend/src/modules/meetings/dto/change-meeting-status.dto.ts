@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsEnum, IsString, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { MeetingStatus } from '@mexagenda/shared';
+import { MeetingStatus } from '../../../_shared';
 
 export class ChangeMeetingStatusDto {
   @ApiProperty({

@@ -38,7 +38,7 @@ import {
   AttendanceSummary,
   PaginatedResponse,
   AuthUser,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { AuditOutcome, Prisma } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 

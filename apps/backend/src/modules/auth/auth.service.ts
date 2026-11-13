@@ -12,9 +12,9 @@ import { TokenService } from '../../common/crypto/token.service';
 import { SessionsService } from '../sessions/sessions.service';
 import { MfaService } from '../mfa/mfa.service';
 import { AuditService } from '../audit/audit.service';
-import { validatePasswordPolicy } from '@mexagenda/validation';
+import { validatePasswordPolicy } from '../../_validation';
 import { UserStatus, AuditOutcome } from '@prisma/client';
-import { AuthUser, LoginResponse } from '@mexagenda/shared';
+import { AuthUser, LoginResponse } from '../../_shared';
 
 @Injectable()
 export class AuthService {

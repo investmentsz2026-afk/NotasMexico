@@ -33,7 +33,7 @@ import {
   type DownloadUrlDto,
   type PaginatedResponse,
   type AuthUser,
-} from '@mexagenda/shared';
+} from '../../_shared';
 
 @ApiTags('MOD-05 — Bóveda Digital y Gestión Documental')
 @Controller('documents')

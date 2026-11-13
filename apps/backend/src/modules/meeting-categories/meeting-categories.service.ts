@@ -8,7 +8,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { CreateMeetingCategoryDto } from './dto/create-meeting-category.dto';
 import { UpdateMeetingCategoryDto } from './dto/update-meeting-category.dto';
-import { MeetingCategoryDto } from '@mexagenda/shared';
+import { MeetingCategoryDto } from '../../_shared';
 import { AuditOutcome } from '@prisma/client';
 
 @Injectable()

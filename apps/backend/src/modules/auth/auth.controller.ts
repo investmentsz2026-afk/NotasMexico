@@ -36,7 +36,7 @@ import type {
   MfaEnrollResponse,
   MfaConfirmResponse,
   SessionInfo,
-} from '@mexagenda/shared';
+} from '../../_shared';
 
 @ApiTags('Autenticación y Control de Acceso')
 @Controller('auth')

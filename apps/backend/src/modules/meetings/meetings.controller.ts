@@ -46,7 +46,7 @@ import type {
   MeetingDetailDto,
   PaginatedResponse,
   AuthUser,
-} from '@mexagenda/shared';
+} from '../../_shared';
 
 @ApiTags('Gestión Institucional de Reuniones y Sesiones')
 @Controller('meetings')

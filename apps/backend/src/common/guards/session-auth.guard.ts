@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { SessionsService } from '../../modules/sessions/sessions.service';
-import { AuthUser } from '@mexagenda/shared';
+import { AuthUser } from '../../_shared';
 
 @Injectable()
 export class SessionAuthGuard implements CanActivate {

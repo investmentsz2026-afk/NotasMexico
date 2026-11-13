@@ -2,7 +2,7 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { MfaCryptoService } from '../../common/crypto/mfa-crypto.service';
 import { TokenService } from '../../common/crypto/token.service';
-import { MfaEnrollResponse, MfaConfirmResponse } from '@mexagenda/shared';
+import { MfaEnrollResponse, MfaConfirmResponse } from '../../_shared';
 import { generateSecret, generateURI, verifySync } from 'otplib';
 import * as QRCode from 'qrcode';
 

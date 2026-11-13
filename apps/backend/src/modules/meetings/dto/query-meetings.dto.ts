@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsUUID, IsEnum, IsInt, Min, Max, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { MeetingStatus, MeetingModality } from '@mexagenda/shared';
+import { MeetingStatus, MeetingModality } from '../../../_shared';
 
 export class QueryMeetingsDto {
   @ApiProperty({ description: 'Número de página (paginación base 1)', default: 1, required: false })

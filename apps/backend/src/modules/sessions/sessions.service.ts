@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { TokenService } from '../../common/crypto/token.service';
 import { UserStatus, UserSession, User, Role, Permission } from '@prisma/client';
-import { SessionInfo } from '@mexagenda/shared';
+import { SessionInfo } from '../../_shared';
 
 export interface ValidatedSessionResult {
   session: UserSession;

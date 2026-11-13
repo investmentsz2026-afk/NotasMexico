@@ -10,7 +10,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { MeetingModality } from '@mexagenda/shared';
+import { MeetingModality } from '../../../_shared';
 
 export class UpdateMeetingDto {
   @ApiProperty({ description: 'Título de la reunión', required: false })

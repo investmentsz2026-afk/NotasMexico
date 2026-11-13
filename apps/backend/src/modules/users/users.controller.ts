@@ -22,7 +22,7 @@ import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { ApiResponse, AuthUser } from '@mexagenda/shared';
+import type { ApiResponse, AuthUser } from '../../_shared';
 
 @ApiTags('Directorio y Gestión de Usuarios Institucionales')
 @Controller('users')

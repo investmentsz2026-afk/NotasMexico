@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { ApiErrorResponse } from '@mexagenda/shared';
+import type { ApiErrorResponse } from '../../_shared';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

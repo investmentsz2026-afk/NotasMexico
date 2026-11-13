@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { AgreementStatus, AgreementPriority } from '@mexagenda/shared';
+import { AgreementStatus, AgreementPriority } from '../../../_shared';
 
 export class QueryAgreementsDto {
   @ApiProperty({ description: 'Número de página (base 1)', default: 1, required: false })

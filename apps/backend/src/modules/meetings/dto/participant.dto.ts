@@ -9,7 +9,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { AttendanceStatus } from '@mexagenda/shared';
+import { AttendanceStatus } from '../../../_shared';
 
 export class AddParticipantDto {
   @ApiProperty({ description: 'UUID de usuario institucional registrado (omitir si es externo)', required: false })

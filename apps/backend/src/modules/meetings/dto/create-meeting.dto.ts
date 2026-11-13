@@ -9,7 +9,7 @@ import {
   IsDateString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { MeetingModality, MeetingStatus } from '@mexagenda/shared';
+import { MeetingModality, MeetingStatus } from '../../../_shared';
 
 export class CreateMeetingDto {
   @ApiProperty({

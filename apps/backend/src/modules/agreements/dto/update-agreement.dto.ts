@@ -9,7 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { AgreementPriority } from '@mexagenda/shared';
+import { AgreementPriority } from '../../../_shared';
 
 export class UpdateAgreementDto {
   @ApiProperty({ description: 'Título del acuerdo', required: false })

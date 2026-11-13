@@ -34,7 +34,7 @@ import {
   AgreementReportsDto,
   PaginatedResponse,
   AuditOutcome,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { Prisma, UserStatus } from '@prisma/client';
 
 @Injectable()

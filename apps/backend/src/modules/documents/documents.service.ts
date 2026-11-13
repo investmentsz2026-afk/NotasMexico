@@ -20,7 +20,7 @@ import {
   DownloadUrlDto,
   PaginatedResponse,
   FileScanStatus,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { AuditOutcome, Prisma } from '@prisma/client';
 
 @Injectable()

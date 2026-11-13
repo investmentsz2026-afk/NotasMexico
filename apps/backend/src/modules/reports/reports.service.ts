@@ -15,7 +15,7 @@ import {
   ReportCategoryDistribution,
   ReportOverdueAlert,
   ReportExpirationTrafficLight,
-} from '@mexagenda/shared';
+} from '../../_shared';
 import { AgreementStatus, MeetingStatus, AttendanceStatus } from '@prisma/client';
 import { QueryReportsDto } from './dto/query-reports.dto';
 import { ExportReportsDto } from './dto/export-reports.dto';

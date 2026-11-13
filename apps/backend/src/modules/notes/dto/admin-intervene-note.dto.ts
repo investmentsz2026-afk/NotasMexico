@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { NoteCategory, NoteVisibility } from '@mexagenda/shared';
+import { NoteCategory, NoteVisibility } from '../../../_shared';
 
 export class AdminInterveneNoteDto {
   @ApiProperty({

@@ -30,7 +30,7 @@ import type {
   PersonalNoteVersionDto,
   PaginatedResponse,
   AuthUser,
-} from '@mexagenda/shared';
+} from '../../_shared';
 
 @ApiTags('MOD-04 — Anotaciones Personales y Notas de Sesión')
 @Controller('notes')

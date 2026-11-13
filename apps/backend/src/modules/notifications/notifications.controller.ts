@@ -19,7 +19,7 @@ import { SessionAuthGuard } from '../../common/guards/session-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { AuthUser, ApiResponse, PaginatedResponse } from '@mexagenda/shared';
+import type { AuthUser, ApiResponse, PaginatedResponse } from '../../_shared';
 
 @ApiTags('MOD-06 — Notificaciones Institucionales y SMTP')
 @Controller('notifications')

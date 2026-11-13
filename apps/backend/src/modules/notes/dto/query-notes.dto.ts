@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { NoteCategory, NoteType, NoteVisibility } from '@mexagenda/shared';
+import { NoteCategory, NoteType, NoteVisibility } from '../../../_shared';
 
 export class QueryNotesDto {
   @ApiPropertyOptional({ description: 'Número de página (base 1)', default: 1 })

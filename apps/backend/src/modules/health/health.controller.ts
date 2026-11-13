@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse as SwaggerResponse } from '@nestjs/swagger';
 import { HealthService } from './health.service';
-import { HealthCheckResponse } from '@mexagenda/shared';
+import type { HealthCheckResponse } from '@mexagenda/shared';
 
 @ApiTags('Infraestructura y Salud')
 @Controller('health')

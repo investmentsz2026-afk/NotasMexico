@@ -14,7 +14,7 @@ import {
   ParseBoolPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse as SwaggerApiResponse, ApiCookieAuth } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { MeetingCategoriesService } from './meeting-categories.service';
 import { CreateMeetingCategoryDto } from './dto/create-meeting-category.dto';
 import { UpdateMeetingCategoryDto } from './dto/update-meeting-category.dto';
@@ -23,7 +23,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { ApiResponse, MeetingCategoryDto, AuthUser } from '@mexagenda/shared';
+import type { ApiResponse, MeetingCategoryDto, AuthUser } from '@mexagenda/shared';
 
 @ApiTags('Categorías y Taxonomía de Reuniones')
 @Controller('meeting-categories')

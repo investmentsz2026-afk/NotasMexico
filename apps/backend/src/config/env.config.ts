@@ -40,8 +40,36 @@ export function preloadDotEnvFiles(): void {
   }
 }
 
+export function sanitizeDatabaseUrl(rawUrl?: string): string | undefined {
+  if (!rawUrl) return undefined;
+  let cleaned = rawUrl.trim();
+  if (
+    (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+    (cleaned.startsWith("'") && cleaned.endsWith("'"))
+  ) {
+    cleaned = cleaned.slice(1, -1).trim();
+  }
+  cleaned = cleaned
+    .replace(/[?&]channel_binding=require/gi, '')
+    .replace(/\?&/, '?')
+    .replace(/[?&]$/, '');
+
+  if (cleaned.includes('neon.tech') && !cleaned.includes('sslmode=')) {
+    cleaned += (cleaned.includes('?') ? '&' : '?') + 'sslmode=require';
+  }
+  return cleaned;
+}
+
 export function loadAndValidateEnv(): ValidatedEnvironment {
   preloadDotEnvFiles();
+
+  if (process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+  }
+  if (process.env.DIRECT_URL) {
+    process.env.DIRECT_URL = sanitizeDatabaseUrl(process.env.DIRECT_URL);
+  }
+
   const result = validateEnvironment(process.env);
 
   if (!result.isValid || !result.config) {

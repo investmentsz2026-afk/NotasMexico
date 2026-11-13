@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse as SwaggerApiResponse, ApiCookieAuth, ApiConsumes } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { DocumentsService } from './documents.service';
 import { UploadDocumentDto } from './dto/upload-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
@@ -26,13 +26,13 @@ import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import {
-  ApiResponse,
-  DocumentListItemDto,
-  DocumentDetailDto,
-  DownloadUrlDto,
-  PaginatedResponse,
-  AuthUser,
   FileScanStatus,
+  type ApiResponse,
+  type DocumentListItemDto,
+  type DocumentDetailDto,
+  type DownloadUrlDto,
+  type PaginatedResponse,
+  type AuthUser,
 } from '@mexagenda/shared';
 
 @ApiTags('MOD-05 — Bóveda Digital y Gestión Documental')

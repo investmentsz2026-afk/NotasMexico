@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { sanitizeDatabaseUrl } from '../config/env.config';
 
 @Injectable()
 export class PrismaService
@@ -14,7 +15,13 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
+    const cleanUrl = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+    if (cleanUrl) {
+      process.env.DATABASE_URL = cleanUrl;
+    }
+
     super({
+      ...(cleanUrl ? { datasources: { db: { url: cleanUrl } } } : {}),
       log:
         process.env.NODE_ENV === 'development'
           ? [

@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { StorageDriver, UploadFileOptions } from './storage.interface';
+import type { StorageDriver, UploadFileOptions } from './storage.interface';
 
 @Injectable()
 export class LocalStorageService implements StorageDriver {
@@ -12,13 +13,36 @@ export class LocalStorageService implements StorageDriver {
   private readonly backendUrl: string;
 
   constructor(options?: { basePath?: string; secretKey?: string; backendUrl?: string }) {
-    this.basePath = options?.basePath || path.resolve(process.cwd(), 'storage', 'vault');
+    const isServerless = Boolean(
+      process.env.VERCEL ||
+      process.env.VERCEL_ENV ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.cwd().startsWith('/var/task'),
+    );
+    const defaultPath = isServerless
+      ? path.resolve(os.tmpdir(), 'mexagenda-storage', 'vault')
+      : path.resolve(process.cwd(), 'storage', 'vault');
+
+    let resolvedPath = options?.basePath || defaultPath;
     this.secretKey = options?.secretKey || 'mexagenda_local_vault_secret_key_2026';
     this.backendUrl = options?.backendUrl || process.env.BACKEND_URL || 'http://localhost:4000';
 
-    if (!fs.existsSync(this.basePath)) {
-      fs.mkdirSync(this.basePath, { recursive: true });
+    try {
+      if (!fs.existsSync(resolvedPath)) {
+        fs.mkdirSync(resolvedPath, { recursive: true });
+      }
+    } catch {
+      resolvedPath = path.resolve(os.tmpdir(), 'mexagenda-storage', 'vault');
+      try {
+        if (!fs.existsSync(resolvedPath)) {
+          fs.mkdirSync(resolvedPath, { recursive: true });
+        }
+      } catch (err) {
+        this.logger.warn(`No fue posible crear directorio temporal: ${(err as Error).message}`);
+      }
     }
+
+    this.basePath = resolvedPath;
     this.logger.log(`LocalStorageService inicializado en sandbox: ${this.basePath}`);
   }
 

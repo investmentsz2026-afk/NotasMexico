@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse as SwaggerApiResponse, ApiCookieAuth } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { MfaService } from '../mfa/mfa.service';
 import { SessionsService } from '../sessions/sessions.service';
@@ -29,7 +29,7 @@ import { SessionAuthGuard } from '../../common/guards/session-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import {
+import type {
   ApiResponse,
   AuthUser,
   LoginResponse,

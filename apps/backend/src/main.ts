@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -22,19 +23,27 @@ async function bootstrap() {
   });
 
   // 2. Cabeceras de seguridad HTTP con Helmet
-  app.use(
-    helmet({
-      contentSecurityPolicy: env.NODE_ENV === 'production',
-      crossOriginEmbedderPolicy: false,
-    }),
-  );
+  const helmetMiddleware =
+    typeof helmet === 'function'
+      ? helmet
+      : (helmet as unknown as { default: typeof helmet }).default;
+  if (typeof helmetMiddleware === 'function') {
+    app.use(
+      helmetMiddleware({
+        contentSecurityPolicy: env.NODE_ENV === 'production',
+        crossOriginEmbedderPolicy: false,
+      }),
+    );
+  }
 
   // 3. Manejo de cookies firmadas y seguras
   const cookieParserMiddleware =
     typeof cookieParser === 'function'
       ? cookieParser
       : (cookieParser as unknown as { default: typeof cookieParser }).default;
-  app.use(cookieParserMiddleware());
+  if (typeof cookieParserMiddleware === 'function') {
+    app.use(cookieParserMiddleware());
+  }
 
   // 4. CORS restrictivo con lista explícita de orígenes autorizados y soporte Vercel
   const allowedOrigins: (string | RegExp)[] = [env.FRONTEND_URL];
@@ -81,29 +90,32 @@ async function bootstrap() {
   );
 
   // 8. Documentación OpenAPI / Swagger
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('MexAgenda — API de Gestión Institucional')
-    .setDescription(
-      'Documentación técnica oficial de los endpoints de la plataforma privada MexAgenda.',
-    )
-    .setVersion('1.0.0')
-    .addBearerAuth()
-    .addCookieAuth('__Host-mexagenda_session')
-    .addTag('Autenticación y Control de Acceso', 'Inicio de sesión, MFA, sesiones y seguridad de credenciales')
-    .addTag('Infraestructura y Salud', 'Verificaciones de estado y diagnóstico')
-    .build();
+  try {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('MexAgenda — API de Gestión Institucional')
+      .setDescription(
+        'Documentación técnica oficial de los endpoints de la plataforma privada MexAgenda.',
+      )
+      .setVersion('1.0.0')
+      .addBearerAuth()
+      .addCookieAuth('__Host-mexagenda_session')
+      .addTag('Autenticación y Control de Acceso', 'Inicio de sesión, MFA, sesiones y seguridad de credenciales')
+      .addTag('Infraestructura y Salud', 'Verificaciones de estado y diagnóstico')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  } catch (swaggerErr) {
+    logger.warn(`Swagger UI omitido en entorno serverless: ${(swaggerErr as Error).message}`);
+  }
 
   // 9. Iniciar escucha en el puerto validado
-  await app.listen(env.PORT);
-  logger.log(`Servidor Backend NestJS ejecutándose en: http://localhost:${env.PORT}/api/v1`);
-  logger.log(`Documentación OpenAPI disponible en: http://localhost:${env.PORT}/api/docs`);
+  const listenPort = process.env.PORT ?? env.PORT ?? 4000;
+  await app.listen(listenPort);
+  logger.log(`Servidor Backend NestJS ejecutándose en puerto ${listenPort}`);
 }
 
 bootstrap().catch((err) => {
   const logger = new Logger('FatalBootstrap');
   logger.error('Error fatal al iniciar la aplicación backend:', err);
-  process.exit(1);
 });

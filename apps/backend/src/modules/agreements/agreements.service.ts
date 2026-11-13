@@ -1589,8 +1589,8 @@ export class AgreementsService {
 
     return {
       metrics: dashboard.metrics,
-      upcomingDue: upcomingDueQuery.items.filter((it) => it.status !== AgreementStatus.CUMPLIDO),
-      overdue: overdueQuery.items.filter((it) => it.status === AgreementStatus.VENCIDO),
+      upcomingDue: upcomingDueQuery.items.filter((it: any) => it.status !== AgreementStatus.CUMPLIDO),
+      overdue: overdueQuery.items.filter((it: any) => it.status === AgreementStatus.VENCIDO),
       byPriority,
       byType,
     };

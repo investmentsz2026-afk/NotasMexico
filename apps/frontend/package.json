@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
+    "prebuild": "pnpm --filter @mexagenda/shared build && pnpm --filter @mexagenda/validation build",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",

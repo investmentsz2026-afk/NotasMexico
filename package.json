@@ -4,6 +4,7 @@
   "private": true,
   "description": "Sistema Privado de Gestión Institucional — Plataforma Soberana de Gobernanza y Sesiones",
   "scripts": {
+    "postinstall": "pnpm prisma:generate && pnpm build:packages",
     "dev": "pnpm --parallel --filter @mexagenda/backend --filter @mexagenda/frontend dev",
     "dev:backend": "pnpm --filter @mexagenda/backend dev",
     "dev:frontend": "pnpm --filter @mexagenda/frontend dev",

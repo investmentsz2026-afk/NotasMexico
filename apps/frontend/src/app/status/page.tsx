@@ -23,7 +23,10 @@ export default function StatusPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+      const backendUrl =
+        process.env.BACKEND_SERVICE_URL ||
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+        (typeof window !== 'undefined' ? '' : 'http://localhost:4000');
       const res = await fetch(`${backendUrl}/api/v1/health`, {
         cache: 'no-store',
       });

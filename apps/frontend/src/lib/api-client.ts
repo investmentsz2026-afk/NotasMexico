@@ -1,7 +1,9 @@
 import { ApiResponse, ApiErrorResponse } from '@mexagenda/shared';
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+  process.env.BACKEND_SERVICE_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (typeof window !== 'undefined' ? '' : 'http://localhost:4000');
 
 export class ApiClientError extends Error {
   constructor(public readonly problem: ApiErrorResponse) {

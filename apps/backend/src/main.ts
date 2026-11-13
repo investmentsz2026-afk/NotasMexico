@@ -36,9 +36,29 @@ async function bootstrap() {
       : (cookieParser as unknown as { default: typeof cookieParser }).default;
   app.use(cookieParserMiddleware());
 
-  // 4. CORS restrictivo con lista explícita de orígenes autorizados
+  // 4. CORS restrictivo con lista explícita de orígenes autorizados y soporte Vercel
+  const allowedOrigins: (string | RegExp)[] = [env.FRONTEND_URL];
+  if (process.env.VERCEL_URL) {
+    allowedOrigins.push(`https://${process.env.VERCEL_URL}`);
+  }
+  allowedOrigins.push(/\.vercel\.app$/);
+
   app.enableCors({
-    origin: [env.FRONTEND_URL],
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      // Permitir solicitudes sin cabecera origin (llamadas internas, SSR, healthchecks)
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.some((allowed) =>
+        typeof allowed === 'string' ? allowed === origin : allowed.test(origin),
+      );
+      if (isAllowed || env.NODE_ENV !== 'production') {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS bloqueado para el origen no autorizado: ${origin}`));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-Id'],

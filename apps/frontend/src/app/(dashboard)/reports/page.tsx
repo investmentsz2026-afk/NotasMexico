@@ -129,7 +129,10 @@ export default function ReportsPage() {
       const separator = query ? '&' : '?';
       const url = `/reports/export${query}${separator}type=${type}`;
       
-      const baseBackend = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+      const baseBackend =
+        process.env.BACKEND_SERVICE_URL ||
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+        (typeof window !== 'undefined' ? '' : 'http://localhost:4000');
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || `${baseBackend}/api/v1`;
       const token = typeof window !== 'undefined' ? localStorage.getItem('mexagenda_token') : null;
 

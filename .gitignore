@@ -36,7 +36,8 @@ pnpm-debug.log*
 *.db
 prisma/*.db
 prisma/*.sqlite
-storage/
+/storage/
+apps/backend/storage/
 
 # Sistema Operativo y Editores
 .DS_Store

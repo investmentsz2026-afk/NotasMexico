@@ -1,21 +1,31 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import express, { Express, Request, Response } from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { loadAndValidateEnv } from './config/env.config';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
-async function bootstrap() {
+let cachedApp: Express | null = null;
+let nestAppInstance: INestApplication | null = null;
+
+export async function bootstrapApp(): Promise<Express> {
+  if (cachedApp) {
+    return cachedApp;
+  }
+
   const logger = new Logger('Bootstrap');
 
   // 1. Cargar y validar configuración de entorno estricta
   const env = loadAndValidateEnv();
 
-  const app = await NestFactory.create(AppModule, {
+  const server: Express = express();
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     logger:
       env.NODE_ENV === 'development'
         ? ['log', 'error', 'warn', 'debug', 'verbose']
@@ -109,13 +119,34 @@ async function bootstrap() {
     logger.warn(`Swagger UI omitido en entorno serverless: ${(swaggerErr as Error).message}`);
   }
 
-  // 9. Iniciar escucha en el puerto validado
-  const listenPort = process.env.PORT ?? env.PORT ?? 4000;
-  await app.listen(listenPort);
-  logger.log(`Servidor Backend NestJS ejecutándose en puerto ${listenPort}`);
+  await app.init();
+  nestAppInstance = app;
+  cachedApp = server;
+  logger.log('MexAgenda NestJS backend inicializado correctamente.');
+  return cachedApp;
 }
 
-bootstrap().catch((err) => {
-  const logger = new Logger('FatalBootstrap');
-  logger.error('Error fatal al iniciar la aplicación backend:', err);
-});
+// Export default para invocación directa como Serverless Function en Vercel
+export default async function handler(req: Request, res: Response) {
+  const server = await bootstrapApp();
+  return server(req, res);
+}
+
+// En entorno local o contenedor fuera de Vercel/Lambda, iniciar escucha TCP
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  bootstrapApp()
+    .then(async () => {
+      const env = loadAndValidateEnv();
+      const listenPort = process.env.PORT ?? env.PORT ?? 4000;
+      if (nestAppInstance) {
+        await nestAppInstance.listen(listenPort);
+        const logger = new Logger('Bootstrap');
+        logger.log(`Servidor Backend NestJS ejecutándose en: http://localhost:${listenPort}/api/v1`);
+      }
+    })
+    .catch((err) => {
+      const logger = new Logger('FatalBootstrap');
+      logger.error('Error fatal al iniciar la aplicación backend:', err);
+      process.exit(1);
+    });
+}

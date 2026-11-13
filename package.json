@@ -38,7 +38,7 @@
     "test:e2e:phase9": "node scripts/e2e-playwright-phase9.js"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": "22.x",
     "pnpm": ">=9.0.0"
   },
   "devDependencies": {

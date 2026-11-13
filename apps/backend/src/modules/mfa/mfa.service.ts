@@ -3,8 +3,21 @@ import { PrismaService } from '../../database/prisma.service';
 import { MfaCryptoService } from '../../common/crypto/mfa-crypto.service';
 import { TokenService } from '../../common/crypto/token.service';
 import { MfaEnrollResponse, MfaConfirmResponse } from '../../_shared';
-import { generateSecret, generateURI, verifySync } from 'otplib';
 import * as QRCode from 'qrcode';
+
+// otplib v13 depende de módulos ESM; se carga de forma diferida para no romper el arranque serverless.
+type OtplibModule = typeof import('otplib');
+let otplibCache: OtplibModule | null = null;
+function otplib(): OtplibModule {
+  if (!otplibCache) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    otplibCache = require('otplib') as OtplibModule;
+  }
+  return otplibCache;
+}
+const generateSecret: OtplibModule['generateSecret'] = (...args) => otplib().generateSecret(...args);
+const generateURI: OtplibModule['generateURI'] = (...args) => otplib().generateURI(...args);
+const verifySync: OtplibModule['verifySync'] = (...args) => otplib().verifySync(...args);
 
 @Injectable()
 export class MfaService {

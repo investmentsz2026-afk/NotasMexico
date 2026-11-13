@@ -2,6 +2,7 @@
   "name": "@mexagenda/backend",
   "version": "1.0.0",
   "private": true,
+  "engines": { "node": "22.x" },
   "scripts": {
     "prebuild": "pnpm --filter @mexagenda/shared build && pnpm --filter @mexagenda/validation build && pnpm --filter mexagenda prisma:generate && node ../../scripts/materialize-workspace-pkgs.js",
     "build": "nest build",

@@ -126,7 +126,7 @@ export async function bootstrapApp(): Promise<Express> {
   return cachedApp;
 }
 
-// Export default para invocación directa como Serverless Function en Vercel
+// Export default para compatibilidad con invocación directa como Serverless Function
 export default async function handler(req: Request, res: Response) {
   try {
     const server = await bootstrapApp();
@@ -156,21 +156,26 @@ export default async function handler(req: Request, res: Response) {
   }
 }
 
-// En entorno local o contenedor fuera de Vercel/Lambda, iniciar escucha TCP
-if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  bootstrapApp()
-    .then(async () => {
-      const env = loadAndValidateEnv();
-      const listenPort = process.env.PORT ?? env.PORT ?? 4000;
-      if (nestAppInstance) {
-        await nestAppInstance.listen(listenPort);
+// Iniciar servidor HTTP tanto en Vercel Fluid Compute como en entorno local
+async function bootstrap() {
+  try {
+    await bootstrapApp();
+    const env = loadAndValidateEnv();
+    const listenPort = process.env.PORT ? parseInt(process.env.PORT, 10) : (env.PORT || 4000);
+    if (nestAppInstance) {
+      const httpServer = nestAppInstance.getHttpServer();
+      if (!httpServer || !httpServer.listening) {
+        await nestAppInstance.listen(listenPort, '0.0.0.0');
         const logger = new Logger('Bootstrap');
-        logger.log(`Servidor Backend NestJS ejecutándose en: http://localhost:${listenPort}/api/v1`);
+        logger.log(`MexAgenda backend escuchando en http://0.0.0.0:${listenPort}/api/v1`);
       }
-    })
-    .catch((err) => {
-      const logger = new Logger('FatalBootstrap');
-      logger.error('Error fatal al iniciar la aplicación backend:', err);
-      process.exit(1);
-    });
+    }
+  } catch (err: any) {
+    if (err?.code !== 'EADDRINUSE') {
+      const logger = new Logger('Bootstrap');
+      logger.error('Error al inicializar la escucha del servidor backend:', err);
+    }
+  }
 }
+
+bootstrap();

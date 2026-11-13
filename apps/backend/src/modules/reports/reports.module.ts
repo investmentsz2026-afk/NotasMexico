@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { DatabaseModule } from '../../database/database.module';
+import { SessionsModule } from '../sessions/sessions.module';
+import { AuditModule } from '../audit/audit.module';
+import { ReportsController } from './reports.controller';
+import { ReportsService } from './reports.service';
+
+@Module({
+  imports: [DatabaseModule, SessionsModule, AuditModule],
+  controllers: [ReportsController],
+  providers: [ReportsService],
+  exports: [ReportsService],
+})
+export class ReportsModule {}
+

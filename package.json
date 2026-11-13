@@ -1,0 +1,52 @@
+{
+  "name": "mexagenda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema Privado de Gestión Institucional — Plataforma Soberana de Gobernanza y Sesiones",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @mexagenda/backend --filter @mexagenda/frontend dev",
+    "dev:backend": "pnpm --filter @mexagenda/backend dev",
+    "dev:frontend": "pnpm --filter @mexagenda/frontend dev",
+    "build:packages": "pnpm --filter @mexagenda/shared build && pnpm --filter @mexagenda/validation build",
+    "build:backend": "pnpm --filter @mexagenda/backend build",
+    "build:frontend": "pnpm --filter @mexagenda/frontend build",
+    "build": "pnpm build:packages && pnpm prisma:generate && pnpm build:backend && pnpm build:frontend",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "lint": "pnpm --filter @mexagenda/frontend lint",
+    "clean": "pnpm -r run clean",
+    "prisma:validate": "node scripts/prisma-runner.js validate",
+    "prisma:generate": "node scripts/prisma-runner.js generate",
+    "prisma:migrate:dev": "node scripts/prisma-runner.js migrate dev",
+    "prisma:migrate:deploy": "node scripts/prisma-runner.js migrate deploy",
+    "verify:infra": "node scripts/verify-infra.js",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
+    "test:phase2": "node scripts/test-phase2.js",
+    "test:phase3": "node scripts/test-phase3.js",
+    "test:phase3-audit": "node scripts/test-phase3-audit.js",
+    "test:phase4": "node scripts/test-phase4.js",
+    "test:phase4-audit": "node scripts/test-phase4-audit.js",
+    "test:phase5": "node scripts/test-phase5.js",
+    "test:phase5-audit": "node scripts/test-phase5-audit.js",
+    "test:phase6": "node scripts/test-phase6.js",
+    "test:phase6-audit": "node scripts/test-phase6-audit.js",
+    "test:phase7": "node scripts/test-phase7.js",
+    "test:phase7-audit": "node scripts/test-phase7-audit.js",
+    "test:phase7-fixes": "node scripts/test-phase7-fixes.js",
+    "test:phase8": "node scripts/test-phase8.js",
+    "test:phase9": "node scripts/test-phase9.js",
+    "test:e2e:phase9": "node scripts/e2e-playwright-phase9.js"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "prisma": "6.19.3",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@12.16.1",
+  "dependencies": {
+    "@prisma/client": "6.19.3"
+  }
+}

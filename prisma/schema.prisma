@@ -1,0 +1,884 @@
+// ==============================================================================
+// ESQUEMA OFICIAL DE DATOS — MEXAGENDA
+// Base de datos: Neon PostgreSQL Serverless
+// ORM: Prisma Client
+// ==============================================================================
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -------------------------------------------------------------
+// ENUMS DE NEGOCIO Y CONTROL INSTITUCIONAL
+// -------------------------------------------------------------
+
+enum UserStatus {
+  ACTIVO
+  INACTIVO
+  BLOQUEADO
+  PENDIENTE_ACTIVACION
+}
+
+enum MeetingModality {
+  PRESENCIAL
+  VIRTUAL
+  HIBRIDA
+}
+
+enum MeetingStatus {
+  BORRADOR
+  PROGRAMADA
+  CONVOCADA
+  EN_DESARROLLO
+  FINALIZADA
+  CANCELADA
+  ARCHIVADA
+}
+
+enum AttendanceStatus {
+  CONVOCADO
+  CONFIRMADO
+  ASISTIO
+  FALTA_JUSTIFICADA
+  FALTA_INJUSTIFICADA
+  PENDIENTE
+  PRESENTE
+  AUSENTE
+  JUSTIFICADO
+  TARDANZA
+  PARTICIPACION_REMOTA
+}
+
+enum AgreementStatus {
+  PENDIENTE
+  EN_PROCESO
+  COMPLETADO
+  CUMPLIDO
+  VENCIDO
+  SUSPENDIDO
+  CANCELADO
+}
+
+enum AgreementPriority {
+  BAJA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+enum FileScanStatus {
+  PENDIENTE_REVISION
+  LIMPIO
+  INFECTADO
+  ERROR_ESCANEO
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  DENIED
+}
+
+enum NotificationType {
+  REUNION_CONVOCATORIA
+  REUNION_MODIFICADA
+  REUNION_CANCELADA
+  ACTA_PUBLICADA
+  ACUERDO_ASIGNADO
+  ACUERDO_ACTUALIZADO
+  ACUERDO_ESTADO_CAMBIO
+  NOTA_COMPARTIDA
+  DOCUMENTO_ADJUNTO
+  INSTITUCIONAL_GENERAL
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  AMBOS
+}
+
+enum DeliveryStatus {
+  PENDIENTE
+  EN_PROCESO
+  ENVIADO
+  FALLIDO
+  DESCARTADO
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 01 & 02 & 03 & 04: CONTROL DE ACCESO (RBAC)
+// -------------------------------------------------------------
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(50)
+  code        String   @unique @db.VarChar(30)
+  description String?  @db.VarChar(255)
+  isSystem    Boolean  @default(false) @map("is_system")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique @db.VarChar(80)
+  resource    String   @db.VarChar(50)
+  action      String   @db.VarChar(30)
+  description String?  @db.VarChar(255)
+
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  grantedAt    DateTime   @default(now()) @map("granted_at")
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id            String     @id @default(uuid()) @db.Uuid
+  email         String     @unique @db.VarChar(255)
+  passwordHash  String     @map("password_hash") @db.VarChar(255)
+  firstName     String     @map("first_name") @db.VarChar(100)
+  lastName      String     @map("last_name") @db.VarChar(100)
+  position      String     @db.VarChar(120)
+  phone         String?    @db.VarChar(30)
+  status        UserStatus @default(PENDIENTE_ACTIVACION)
+  roleId        String     @map("role_id") @db.Uuid
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  deletedAt     DateTime?  @map("deleted_at")
+
+  role                       Role                  @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  sessions                   UserSession[]
+  mfa                        UserMfa?
+  resetTokens                PasswordResetToken[]
+  meetingsCreated            Meeting[]             @relation("MeetingCreator")
+  meetingsUpdated            Meeting[]             @relation("MeetingUpdater")
+  meetingsPresided           Meeting[]             @relation("MeetingPresider")
+  meetingsSecretaried        Meeting[]             @relation("MeetingSecretary")
+  convocatoriasPublished     MeetingConvocatoria[] @relation("ConvocatoriaPublisher")
+  agendaItemsResponsible     MeetingAgendaItem[]   @relation("AgendaItemResponsible")
+  attendanceChanges          MeetingAttendanceHistory[] @relation("AttendanceChanger")
+  sessionLogs                MeetingSessionLog[]   @relation("SessionLogAuthor")
+  minutesCreated             MeetingMinutes[]      @relation("MinutesCreator")
+  minutesUpdated             MeetingMinutes[]      @relation("MinutesUpdater")
+  minutesApproved            MeetingMinutes[]      @relation("MinutesApprover")
+  minutesVersions            MeetingMinutesVersion[] @relation("MinutesVersionAuthor")
+  participations             MeetingParticipant[]
+  notes                      PersonalNote[]        @relation("NoteAuthor")
+  noteVersionsEdited         PersonalNoteVersion[] @relation("VersionEditor")
+  adminInterventions         PersonalNote[]        @relation("AdminIntervenor")
+  agreementsCreated          Agreement[]           @relation("AgreementCreator")
+  agreementsAssigned         Agreement[]           @relation("AgreementAssignee")
+  agreementsCompleted        Agreement[]           @relation("AgreementCompleter")
+  agreementCollaborations    AgreementCollaborator[] @relation("CollaboratorUser")
+  agreementCollaboratorsAssigned AgreementCollaborator[] @relation("CollaboratorAssigner")
+  agreementProgressReports   AgreementProgress[]   @relation("ProgressReporter")
+  agreementEvidencesRegistered AgreementEvidence[] @relation("EvidenceRegisterer")
+  agreementHistoryEntries    AgreementHistory[]    @relation("AgreementChanger")
+  agreementHistoryPreviousAssignees AgreementHistory[] @relation("AgreementPreviousAssignee")
+  agreementHistoryNewAssignees AgreementHistory[] @relation("AgreementNewAssignee")
+  attachmentsUploaded        Attachment[]          @relation("AttachmentUploader")
+  attachmentsDeleted         Attachment[]          @relation("AttachmentDeleter")
+  attachmentVersionsUploaded AttachmentVersion[]   @relation("AttachmentVersionUploader")
+  auditActions               AuditLog[]            @relation("AuditActor")
+  notifications              Notification[]        @relation("UserNotifications")
+  notificationPreference     NotificationPreference?
+
+  @@index([status])
+  @@index([roleId])
+  @@map("users")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 05 & 06 & 07 & 08: SESIONES Y SEGURIDAD CRIPTOGRÁFICA
+// -------------------------------------------------------------
+
+model UserSession {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  sessionTokenHash String   @unique @map("session_token_hash") @db.VarChar(128)
+  ipAddress        String   @map("ip_address") @db.VarChar(45)
+  userAgent        String   @map("user_agent") @db.VarChar(300)
+  isRevoked        Boolean  @default(false) @map("is_revoked")
+  lastActivityAt   DateTime @default(now()) @map("last_activity_at")
+  expiresAt        DateTime @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRevoked])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+model UserMfa {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @unique @map("user_id") @db.Uuid
+  encryptedSecret   String    @map("encrypted_secret") @db.Text
+  backupCodesHashes String    @map("backup_codes_hashes") @db.Text
+  isEnabled         Boolean   @default(false) @map("is_enabled")
+  enrolledAt        DateTime? @map("enrolled_at")
+  lastUsedAt        DateTime? @map("last_used_at")
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_mfa")
+}
+
+model LoginAttempt {
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @db.VarChar(255)
+  ipAddress     String   @map("ip_address") @db.VarChar(45)
+  success       Boolean  @default(false)
+  failureReason String?  @map("failure_reason") @db.VarChar(100)
+  attemptedAt   DateTime @default(now()) @map("attempted_at")
+
+  @@index([email, attemptedAt])
+  @@index([ipAddress, attemptedAt])
+  @@map("login_attempts")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  tokenHash  String   @unique @map("token_hash") @db.VarChar(128)
+  isConsumed Boolean  @default(false) @map("is_consumed")
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash, isConsumed])
+  @@map("password_reset_tokens")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 09 & 10 & 11: TAXONOMÍA Y REUNIONES INSTITUCIONALES (AMPLIADO FASE 3)
+// -------------------------------------------------------------
+
+model MeetingCategory {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique @db.VarChar(100)
+  code         String    @unique @db.VarChar(30)
+  description  String?   @db.VarChar(255)
+  colorHex     String    @default("#0F172A") @map("color_hex") @db.VarChar(7)
+  displayOrder Int       @default(0) @map("display_order")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  meetings     Meeting[]
+  agreements   Agreement[]
+
+  @@index([isActive, displayOrder])
+  @@map("meeting_categories")
+}
+
+model Meeting {
+  id                 String          @id @default(uuid()) @db.Uuid
+  folio              String          @unique @db.VarChar(50)
+  title              String          @db.VarChar(250)
+  categoryId         String          @map("category_id") @db.Uuid
+  meetingDate        DateTime        @map("meeting_date") @db.Date
+  startTime          DateTime        @map("start_time") @db.Time(0)
+  endTime            DateTime        @map("end_time") @db.Time(0)
+  realStartTime      DateTime?       @map("real_start_time")
+  realEndTime        DateTime?       @map("real_end_time")
+  location           String          @db.VarChar(255)
+  modality           MeetingModality @default(PRESENCIAL)
+  virtualUrl         String?         @map("virtual_url") @db.VarChar(500)
+  timezone           String          @default("America/Mexico_City") @db.VarChar(60)
+  description        String?         @db.Text
+  observations       String?         @db.Text
+  agendaTopics       String?         @map("agenda_topics") @db.Text
+  minutesDevelopment String?         @map("minutes_development") @db.Text
+  status             MeetingStatus   @default(PROGRAMADA)
+  version            Int             @default(1)
+  createdById        String          @map("created_by_id") @db.Uuid
+  updatedById        String?         @map("updated_by_id") @db.Uuid
+  presidedById       String?         @map("presided_by_id") @db.Uuid
+  secretaryById      String?         @map("secretary_by_id") @db.Uuid
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  deletedAt          DateTime?       @map("deleted_at")
+
+  category           MeetingCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  creator            User            @relation("MeetingCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  updater            User?           @relation("MeetingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  presidedBy         User?           @relation("MeetingPresider", fields: [presidedById], references: [id], onDelete: SetNull)
+  secretaryBy        User?           @relation("MeetingSecretary", fields: [secretaryById], references: [id], onDelete: SetNull)
+
+  convocatoria       MeetingConvocatoria?
+  agendaItems        MeetingAgendaItem[]
+  participants       MeetingParticipant[]
+  sessionLogs        MeetingSessionLog[]
+  minutes            MeetingMinutes?
+
+  notes              PersonalNote[]
+  agreements         Agreement[]
+  attachments        Attachment[]
+
+  @@index([meetingDate, status])
+  @@index([categoryId])
+  @@index([createdById])
+  @@index([status])
+  @@map("meetings")
+}
+
+model MeetingConvocatoria {
+  id                 String    @id @default(uuid()) @db.Uuid
+  meetingId          String    @unique @map("meeting_id") @db.Uuid
+  convocatoriaNumber String    @unique @map("convocatoria_number") @db.VarChar(60)
+  issueDate          DateTime  @default(now()) @map("issue_date")
+  noticeText         String    @map("notice_text") @db.Text
+  isPublished        Boolean   @default(false) @map("is_published")
+  publishedAt        DateTime? @map("published_at")
+  publishedById      String?   @map("published_by_id") @db.Uuid
+  recipients         Json?
+  observations       String?   @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  meeting            Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  publishedBy        User?     @relation("ConvocatoriaPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+
+  @@map("meeting_convocatorias")
+}
+
+model MeetingAgendaItem {
+  id                 String    @id @default(uuid()) @db.Uuid
+  meetingId          String    @map("meeting_id") @db.Uuid
+  orderIndex         Int       @map("order_index")
+  title              String    @db.VarChar(250)
+  description        String?   @db.Text
+  responsibleName    String?   @map("responsible_name") @db.VarChar(150)
+  responsibleUserId  String?   @map("responsible_user_id") @db.Uuid
+  estimatedMinutes   Int?      @map("estimated_minutes")
+  itemType           String    @default("ASUNTOS_ORDINARIOS") @map("item_type") @db.VarChar(50)
+  observations       String?   @db.Text
+  status             String    @default("PENDIENTE") @db.VarChar(30)
+  isTreated          Boolean   @default(false) @map("is_treated")
+  treatedAt          DateTime? @map("treated_at")
+  isDeleted          Boolean   @default(false) @map("is_deleted")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  meeting            Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  responsibleUser    User?     @relation("AgendaItemResponsible", fields: [responsibleUserId], references: [id], onDelete: SetNull)
+  sessionLogs        MeetingSessionLog[]
+  agreements         Agreement[]
+  notes              PersonalNote[]
+
+  @@index([meetingId, orderIndex])
+  @@map("meeting_agenda_items")
+}
+
+model MeetingParticipant {
+  id                     String           @id @default(uuid()) @db.Uuid
+  meetingId              String           @map("meeting_id") @db.Uuid
+  userId                 String?          @map("user_id") @db.Uuid
+  institutionalRole      String           @default("Vocal") @map("institutional_role") @db.VarChar(80)
+  participationCondition String           @default("TITULAR") @map("participation_condition") @db.VarChar(50)
+  attendanceStatus       AttendanceStatus @default(CONVOCADO) @map("attendance_status")
+  isExternal             Boolean          @default(false) @map("is_external")
+  externalName           String?          @map("external_name") @db.VarChar(150)
+  externalEmail          String?          @map("external_email") @db.VarChar(255)
+  externalOrganization   String?          @map("external_organization") @db.VarChar(200)
+  arrivalTime            DateTime?        @map("arrival_time")
+  notes                  String?          @db.Text
+  confirmedAt            DateTime?        @map("confirmed_at")
+
+  meeting                Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user                   User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendanceHistory      MeetingAttendanceHistory[]
+
+  @@unique([meetingId, userId])
+  @@map("meeting_participants")
+}
+
+model MeetingAttendanceHistory {
+  id             String           @id @default(uuid()) @db.Uuid
+  participantId  String           @map("participant_id") @db.Uuid
+  previousStatus AttendanceStatus @map("previous_status")
+  newStatus      AttendanceStatus @map("new_status")
+  changedById    String           @map("changed_by_id") @db.Uuid
+  justification  String?          @db.Text
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  participant    MeetingParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  changer        User               @relation("AttendanceChanger", fields: [changedById], references: [id], onDelete: Restrict)
+
+  @@index([participantId])
+  @@map("meeting_attendance_history")
+}
+
+model MeetingSessionLog {
+  id             String             @id @default(uuid()) @db.Uuid
+  meetingId      String             @map("meeting_id") @db.Uuid
+  entryType      String             @map("entry_type") @db.VarChar(50)
+  description    String             @db.Text
+  agendaItemId   String?            @map("agenda_item_id") @db.Uuid
+  registeredById String             @map("registered_by_id") @db.Uuid
+  timestamp      DateTime           @default(now())
+
+  meeting        Meeting            @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  registeredBy   User               @relation("SessionLogAuthor", fields: [registeredById], references: [id], onDelete: Restrict)
+  agendaItem     MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: SetNull)
+
+  @@index([meetingId, timestamp])
+  @@map("meeting_session_logs")
+}
+
+model MeetingMinutes {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  meetingId            String                  @unique @map("meeting_id") @db.Uuid
+  minutesNumber        String                  @unique @map("minutes_number") @db.VarChar(60)
+  elaborationDate      DateTime                @default(now()) @map("elaboration_date")
+  realStartTime        DateTime?               @map("real_start_time")
+  realEndTime          DateTime?               @map("real_end_time")
+  locationOrModality   String?                 @map("location_or_modality") @db.VarChar(255)
+  presidedByName       String?                 @map("presided_by_name") @db.VarChar(200)
+  secretaryByName      String?                 @map("secretary_by_name") @db.VarChar(200)
+  summary              String                  @db.Text
+  pointsTreatedSummary String?                 @map("points_treated_summary") @db.Text
+  observations         String?                 @db.Text
+  incidents            String?                 @db.Text
+  status               String                  @default("BORRADOR") @db.VarChar(30)
+  approvedAt           DateTime?               @map("approved_at")
+  approvedById         String?                 @map("approved_by_id") @db.Uuid
+  approvalNotes        String?                 @map("approval_notes") @db.Text
+  createdById          String                  @map("created_by_id") @db.Uuid
+  updatedById          String?                 @map("updated_by_id") @db.Uuid
+  version              Int                     @default(1)
+  createdAt            DateTime                @default(now()) @map("created_at")
+  updatedAt            DateTime                @updatedAt @map("updated_at")
+
+  meeting              Meeting                 @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  creator              User                    @relation("MinutesCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  updater              User?                   @relation("MinutesUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  approver             User?                   @relation("MinutesApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  versions             MeetingMinutesVersion[]
+  agreements           Agreement[]
+  attachments          Attachment[]
+
+  @@map("meeting_minutes")
+}
+
+model MeetingMinutesVersion {
+  id                   String         @id @default(uuid()) @db.Uuid
+  minutesId            String         @map("minutes_id") @db.Uuid
+  versionNumber        Int            @map("version_number")
+  summary              String         @db.Text
+  pointsTreatedSummary String?        @map("points_treated_summary") @db.Text
+  observations         String?        @db.Text
+  incidents            String?        @map("incidents") @db.Text
+  status               String         @db.VarChar(30)
+  changedById          String         @map("changed_by_id") @db.Uuid
+  changeReason         String?        @map("change_reason") @db.Text
+  createdAt            DateTime       @default(now()) @map("created_at")
+
+  minutes              MeetingMinutes @relation(fields: [minutesId], references: [id], onDelete: Cascade)
+  changer              User           @relation("MinutesVersionAuthor", fields: [changedById], references: [id], onDelete: Restrict)
+
+  @@unique([minutesId, versionNumber])
+  @@map("meeting_minutes_versions")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 12 & 13: ANOTACIONES INDIVIDUALES Y SOBERANÍA
+// -------------------------------------------------------------
+
+model PersonalNote {
+  id                    String             @id @default(uuid()) @db.Uuid
+  title                 String             @default("Anotación Institucional") @db.VarChar(250)
+  content               String             @db.Text
+  category              String             @default("GENERAL") @db.VarChar(50)
+  noteType              String             @default("PERSONAL") @map("note_type") @db.VarChar(30)
+  visibility            String             @default("PRIVADA") @db.VarChar(30)
+  isFavorite            Boolean            @default(false) @map("is_favorite")
+  tags                  String?            @db.VarChar(255)
+  meetingId             String?            @map("meeting_id") @db.Uuid
+  agendaItemId          String?            @map("agenda_item_id") @db.Uuid
+  agreementId           String?            @map("agreement_id") @db.Uuid
+  authorId              String             @map("author_id") @db.Uuid
+  version               Int                @default(1)
+  isAdminModified       Boolean            @default(false) @map("is_admin_modified")
+  lastAdminIntervenorId String?            @map("last_admin_intervenor_id") @db.Uuid
+  adminJustification    String?            @map("admin_justification") @db.Text
+  isArchived            Boolean            @default(false) @map("is_archived")
+  deletedAt             DateTime?          @map("deleted_at")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  meeting               Meeting?           @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  agendaItem            MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: SetNull)
+  agreement             Agreement?         @relation(fields: [agreementId], references: [id], onDelete: SetNull)
+  author                User               @relation("NoteAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  lastAdminIntervenor   User?              @relation("AdminIntervenor", fields: [lastAdminIntervenorId], references: [id], onDelete: SetNull)
+  versions              PersonalNoteVersion[]
+  attachments           Attachment[]
+
+  @@index([authorId, isArchived])
+  @@index([meetingId, authorId])
+  @@index([agendaItemId])
+  @@index([agreementId])
+  @@index([category])
+  @@index([noteType])
+  @@index([visibility])
+  @@map("personal_notes")
+}
+
+model PersonalNoteVersion {
+  id                  String       @id @default(uuid()) @db.Uuid
+  personalNoteId      String       @map("note_id") @db.Uuid
+  versionNumber       Int          @map("version_number")
+  titleSnapshot       String?      @map("title_snapshot") @db.VarChar(250)
+  contentSnapshot     String       @map("content_snapshot") @db.Text
+  categorySnapshot    String?      @map("category_snapshot") @db.VarChar(50)
+  modifiedById        String       @map("modified_by_id") @db.Uuid
+  changeReason        String?      @map("change_reason") @db.Text
+  adminJustification  String?      @map("admin_justification") @db.Text
+  isAdminIntervention Boolean      @default(false) @map("is_admin_intervention")
+  createdAt           DateTime     @default(now()) @map("created_at")
+
+  personalNote        PersonalNote @relation(fields: [personalNoteId], references: [id], onDelete: Cascade)
+  modifiedBy          User         @relation("VersionEditor", fields: [modifiedById], references: [id], onDelete: Restrict)
+
+  @@unique([personalNoteId, versionNumber])
+  @@index([personalNoteId])
+  @@index([modifiedById])
+  @@map("personal_note_versions")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 14 & 15: ACUERDOS VINCULANTES Y TRAZABILIDAD
+// -------------------------------------------------------------
+
+model Agreement {
+  id                   String             @id @default(uuid()) @db.Uuid
+  folio                String             @unique @db.VarChar(60)
+  title                String             @db.VarChar(250)
+  description          String             @db.Text
+  agreementType        String             @default("ORDINARIO") @map("agreement_type") @db.VarChar(50)
+  meetingId            String             @map("meeting_id") @db.Uuid
+  categoryId           String?            @map("category_id") @db.Uuid
+  agendaItemId         String?            @map("agenda_item_id") @db.Uuid
+  minutesId            String?            @map("minutes_id") @db.Uuid
+  minutesVersionNumber Int?               @map("minutes_version_number")
+  approvalDate         DateTime           @default(now()) @map("approval_date") @db.Date
+  startDate            DateTime?          @map("start_date") @db.Date
+  dueDate              DateTime           @map("due_date") @db.Date
+  completionDate       DateTime?          @map("completion_date") @db.Date
+  priority             AgreementPriority  @default(MEDIA)
+  status               AgreementStatus    @default(PENDIENTE)
+  progressPercent      Int                @default(0) @map("progress_percent")
+  observations         String?            @db.Text
+  changeReason         String?            @map("change_reason") @db.Text
+  createdById          String             @map("created_by_id") @db.Uuid
+  assignedToId         String             @map("assigned_user_id") @db.Uuid
+  completedById        String?            @map("completed_by_id") @db.Uuid
+  isArchived           Boolean            @default(false) @map("is_archived")
+  deletedAt            DateTime?          @map("deleted_at")
+  version              Int                @default(1)
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  meeting              Meeting            @relation(fields: [meetingId], references: [id], onDelete: Restrict)
+  category             MeetingCategory?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  agendaItem           MeetingAgendaItem? @relation(fields: [agendaItemId], references: [id], onDelete: SetNull)
+  minutes              MeetingMinutes?    @relation(fields: [minutesId], references: [id], onDelete: SetNull)
+  creator              User               @relation("AgreementCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  assignee             User               @relation("AgreementAssignee", fields: [assignedToId], references: [id], onDelete: Restrict)
+  completer            User?              @relation("AgreementCompleter", fields: [completedById], references: [id], onDelete: SetNull)
+
+  collaborators        AgreementCollaborator[]
+  progressReports      AgreementProgress[]
+  evidences            AgreementEvidence[]
+  history              AgreementHistory[]
+  notes                PersonalNote[]
+  attachments          Attachment[]
+
+  @@index([assignedToId, status])
+  @@index([dueDate, status])
+  @@index([meetingId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([folio])
+  @@map("agreements")
+}
+
+model AgreementCollaborator {
+  id           String    @id @default(uuid()) @db.Uuid
+  agreementId  String    @map("agreement_id") @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  assignedById String    @map("assigned_by_id") @db.Uuid
+  notes        String?   @db.VarChar(255)
+
+  agreement    Agreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  user         User      @relation("CollaboratorUser", fields: [userId], references: [id], onDelete: Restrict)
+  assignedBy   User      @relation("CollaboratorAssigner", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@unique([agreementId, userId])
+  @@index([agreementId])
+  @@index([userId])
+  @@map("agreement_collaborators")
+}
+
+model AgreementProgress {
+  id              String            @id @default(uuid()) @db.Uuid
+  agreementId     String            @map("agreement_id") @db.Uuid
+  reportedById    String            @map("reported_by_id") @db.Uuid
+  reportedAt      DateTime          @default(now()) @map("reported_at")
+  previousPercent Int               @map("previous_percent")
+  newPercent      Int               @map("new_percent")
+  description     String            @db.Text
+  observations    String?           @db.Text
+  resultingStatus AgreementStatus?  @map("resulting_status")
+  justification   String?           @db.Text
+
+  agreement       Agreement         @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  reportedBy      User              @relation("ProgressReporter", fields: [reportedById], references: [id], onDelete: Restrict)
+  evidences       AgreementEvidence[]
+
+  @@index([agreementId, reportedAt])
+  @@map("agreement_progress")
+}
+
+model AgreementEvidence {
+  id                String             @id @default(uuid()) @db.Uuid
+  agreementId       String             @map("agreement_id") @db.Uuid
+  progressId        String?            @map("progress_id") @db.Uuid
+  title             String             @db.VarChar(250)
+  description       String?            @db.Text
+  documentReference String?            @map("document_reference") @db.VarChar(500)
+  registeredById    String             @map("registered_by_id") @db.Uuid
+  createdAt         DateTime           @default(now()) @map("created_at")
+
+  agreement         Agreement          @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  progress          AgreementProgress? @relation(fields: [progressId], references: [id], onDelete: SetNull)
+  registeredBy      User               @relation("EvidenceRegisterer", fields: [registeredById], references: [id], onDelete: Restrict)
+
+  @@index([agreementId])
+  @@map("agreement_evidences")
+}
+
+model AgreementHistory {
+  id                   String           @id @default(uuid()) @db.Uuid
+  agreementId          String           @map("agreement_id") @db.Uuid
+  actionType           String           @default("STATUS_CHANGE") @map("action_type") @db.VarChar(50)
+  previousStatus       AgreementStatus? @map("previous_status")
+  newStatus            AgreementStatus? @map("new_status")
+  previousAssignedToId String?          @map("previous_assigned_to_id") @db.Uuid
+  newAssignedToId      String?          @map("new_assigned_to_id") @db.Uuid
+  previousDueDate      DateTime?        @map("previous_due_date") @db.Date
+  newDueDate           DateTime?        @map("new_due_date") @db.Date
+  previousPercent      Int?             @map("previous_percent")
+  newPercent           Int?             @map("new_percent")
+  progressNotes        String?          @map("progress_notes") @db.Text
+  changeReason         String?          @map("change_reason") @db.Text
+  details              Json?
+  changedById          String           @map("changed_by_id") @db.Uuid
+  createdAt            DateTime         @default(now()) @map("created_at")
+
+  agreement            Agreement        @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  changer              User             @relation("AgreementChanger", fields: [changedById], references: [id], onDelete: Restrict)
+  previousAssignee     User?            @relation("AgreementPreviousAssignee", fields: [previousAssignedToId], references: [id], onDelete: SetNull)
+  newAssignee          User?            @relation("AgreementNewAssignee", fields: [newAssignedToId], references: [id], onDelete: SetNull)
+
+  @@index([agreementId])
+  @@index([changedById])
+  @@map("agreement_history")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 16 & 17: BÓVEDA DOCUMENTAL (METADATOS S3)
+// -------------------------------------------------------------
+
+model Attachment {
+  id               String         @id @default(uuid()) @db.Uuid
+  meetingId        String?        @map("meeting_id") @db.Uuid
+  agreementId      String?        @map("agreement_id") @db.Uuid
+  personalNoteId   String?        @map("personal_note_id") @db.Uuid
+  minutesId        String?        @map("minutes_id") @db.Uuid
+  uploadedById     String         @map("uploaded_by_id") @db.Uuid
+  originalFilename String         @map("original_filename") @db.VarChar(255)
+  storageKey       String         @unique @map("storage_key") @db.VarChar(255)
+  mimeType         String         @map("mime_type") @db.VarChar(100)
+  fileSizeBytes    BigInt         @map("file_size_bytes")
+  sha256Checksum   String         @map("sha256_checksum") @db.VarChar(64)
+  category         String         @default("GENERAL") @map("category") @db.VarChar(50)
+  description      String?        @db.Text
+  storageProvider  String         @default("S3") @map("storage_provider") @db.VarChar(50)
+  bucketName       String?        @map("bucket_name") @db.VarChar(100)
+  scanStatus       FileScanStatus @default(PENDIENTE_REVISION) @map("scan_status")
+  isDeleted        Boolean        @default(false) @map("is_deleted")
+  deletedAt        DateTime?      @map("deleted_at")
+  deletedById      String?        @map("deleted_by_id") @db.Uuid
+  isArchived       Boolean        @default(false) @map("is_archived")
+  version          Int            @default(1)
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  meeting          Meeting?       @relation(fields: [meetingId], references: [id], onDelete: Restrict)
+  agreement        Agreement?     @relation(fields: [agreementId], references: [id], onDelete: SetNull)
+  personalNote     PersonalNote?  @relation(fields: [personalNoteId], references: [id], onDelete: Restrict)
+  minutes          MeetingMinutes? @relation(fields: [minutesId], references: [id], onDelete: SetNull)
+  uploader         User           @relation("AttachmentUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+  deletedBy        User?          @relation("AttachmentDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
+  versions         AttachmentVersion[]
+
+  @@index([meetingId, isDeleted])
+  @@index([agreementId, isDeleted])
+  @@index([personalNoteId, isDeleted])
+  @@index([minutesId, isDeleted])
+  @@index([uploadedById, isDeleted])
+  @@index([category, isDeleted])
+  @@map("attachments")
+}
+
+model AttachmentVersion {
+  id             String     @id @default(uuid()) @db.Uuid
+  attachmentId   String     @map("attachment_id") @db.Uuid
+  versionNumber  Int        @map("version_number")
+  storageKey     String     @map("storage_key") @db.VarChar(255)
+  fileSizeBytes  BigInt     @map("file_size_bytes")
+  sha256Checksum String     @map("sha256_checksum") @db.VarChar(64)
+  uploadedById   String     @map("uploaded_by_id") @db.Uuid
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  attachment     Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  uploader       User       @relation("AttachmentVersionUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@unique([attachmentId, versionNumber])
+  @@map("attachment_versions")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 18: BITÁCORA DE AUDITORÍA FORENSE INMUTABLE
+// -------------------------------------------------------------
+
+model AuditLog {
+  id          BigInt       @id @default(autoincrement())
+  actorId     String?      @map("actor_id") @db.Uuid
+  action      String       @db.VarChar(80)
+  entity      String       @db.VarChar(60)
+  entityId    String       @map("entity_id") @db.VarChar(80)
+  ipAddress   String       @map("ip_address") @db.VarChar(45)
+  userAgent   String       @map("user_agent") @db.VarChar(300)
+  outcome     AuditOutcome @default(SUCCESS)
+  diffPayload Json?        @map("diff_payload")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  actor       User?        @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 19: CONFIGURACIÓN GLOBAL DEL SISTEMA
+// -------------------------------------------------------------
+
+model SystemSetting {
+  id           String   @id @default(uuid()) @db.Uuid
+  settingKey   String   @unique @map("setting_key") @db.VarChar(80)
+  settingValue String   @map("setting_value") @db.Text
+  description  String?  @db.VarChar(255)
+  isPublic     Boolean  @default(false) @map("is_public")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+// -------------------------------------------------------------
+// ENTIDAD 20 & 21 & 22: NOTIFICACIONES INSTITUCIONALES (MOD-06)
+// -------------------------------------------------------------
+
+model Notification {
+  id           String              @id @default(uuid()) @db.Uuid
+  userId       String              @map("user_id") @db.Uuid
+  type         NotificationType
+  title        String              @db.VarChar(200)
+  message      String              @db.Text
+  resourceType String?             @map("resource_type") @db.VarChar(50)
+  resourceId   String?             @map("resource_id") @db.VarChar(100)
+  actionUrl    String?             @map("action_url") @db.VarChar(255)
+  isRead       Boolean             @default(false) @map("is_read")
+  readAt       DateTime?           @map("read_at")
+  metadata     Json?               @map("metadata")
+  createdAt    DateTime            @default(now()) @map("created_at")
+
+  user         User                @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  deliveries   NotificationDelivery[]
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  emailEnabled    Boolean  @default(true) @map("email_enabled")
+  inAppEnabled    Boolean  @default(true) @map("in_app_enabled")
+  meetingAlerts   Boolean  @default(true) @map("meeting_alerts")
+  agreementAlerts Boolean  @default(true) @map("agreement_alerts")
+  minutesAlerts   Boolean  @default(true) @map("minutes_alerts")
+  generalAlerts   Boolean  @default(true) @map("general_alerts")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model NotificationDelivery {
+  id             String              @id @default(uuid()) @db.Uuid
+  notificationId String              @map("notification_id") @db.Uuid
+  channel        NotificationChannel
+  recipientEmail String?             @map("recipient_email") @db.VarChar(255)
+  subject        String?             @db.VarChar(255)
+  htmlBody       String?             @map("html_body") @db.Text
+  textBody       String?             @map("text_body") @db.Text
+  status         DeliveryStatus      @default(PENDIENTE)
+  attempts       Int                 @default(0)
+  maxAttempts    Int                 @default(3) @map("max_attempts")
+  nextAttemptAt  DateTime            @default(now()) @map("next_attempt_at")
+  sentAt         DateTime?           @map("sent_at")
+  failedAt       DateTime?           @map("failed_at")
+  errorMessage   String?             @map("error_message") @db.Text
+  idempotencyKey String?             @unique @map("idempotency_key") @db.VarChar(150)
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  notification   Notification        @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt])
+  @@index([notificationId])
+  @@index([idempotencyKey])
+  @@map("notification_deliveries")
+}
+

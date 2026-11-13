@@ -25,6 +25,23 @@ export async function bootstrapApp(): Promise<Express> {
   const env = loadAndValidateEnv();
 
   const server: Express = express();
+
+  // Normalizador de rutas para proxies y Serverless en Vercel Services
+  server.use((req, _res, next) => {
+    if (req.url && !req.url.startsWith('/api/docs')) {
+      if (!req.url.startsWith('/api/v1')) {
+        if (req.url.startsWith('/v1/')) {
+          req.url = `/api${req.url}`;
+        } else if (req.url.startsWith('/api/')) {
+          req.url = req.url.replace(/^\/api\//, '/api/v1/');
+        } else {
+          req.url = `/api/v1${req.url.startsWith('/') ? req.url : `/${req.url}`}`;
+        }
+      }
+    }
+    next();
+  });
+
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     logger:
       env.NODE_ENV === 'development'

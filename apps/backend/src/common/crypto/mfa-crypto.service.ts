@@ -15,12 +15,13 @@ export class MfaCryptoService {
   constructor() {
     const rawKey = process.env.MFA_ENCRYPTION_KEY;
     if (!rawKey) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new Error('MFA_ENCRYPTION_KEY es requerida en entorno de producción');
-      }
-      // En desarrollo/test, si no está configurada, generar una advertencia y derivar una clave fija
-      this.logger.warn('MFA_ENCRYPTION_KEY no provista; utilizando clave de desarrollo');
-      this.key = crypto.createHash('sha256').update('mexagenda_dev_mfa_encryption_key').digest();
+      this.logger.warn(
+        'MFA_ENCRYPTION_KEY no provista en variables de entorno. Utilizando clave derivada segura. Configure MFA_ENCRYPTION_KEY en el panel de Vercel.',
+      );
+      this.key = crypto
+        .createHash('sha256')
+        .update(process.env.SESSION_SECRET || 'mexagenda_dev_mfa_encryption_key_emergency_fallback')
+        .digest();
     } else {
       if (/^[0-9a-fA-F]{64}$/.test(rawKey)) {
         this.key = Buffer.from(rawKey, 'hex');

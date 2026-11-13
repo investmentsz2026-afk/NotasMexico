@@ -36,9 +36,13 @@ export default function LoginPage() {
       }
     } catch (err) {
       if (err instanceof ApiClientError) {
-        setError(err.problem.detail || 'Credenciales no válidas o cuenta no disponible.');
+        setError(
+          err.problem.detail ||
+          (err.problem as any).message ||
+          'Credenciales no válidas o cuenta no disponible.'
+        );
       } else {
-        setError('Error al conectar con los servicios de autenticación.');
+        setError((err as Error)?.message || 'Error al conectar con los servicios de autenticación.');
       }
     } finally {
       setIsLoading(false);

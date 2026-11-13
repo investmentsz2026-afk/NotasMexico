@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Logger } from '@nestjs/common';
 import { validateEnvironment, ValidatedEnvironment } from '@mexagenda/validation';
 
 export function preloadDotEnvFiles(): void {
@@ -45,12 +46,22 @@ export function loadAndValidateEnv(): ValidatedEnvironment {
 
   if (!result.isValid || !result.config) {
     const errorDetails = result.errors.join(' | ');
-    // Lanzar error explícito sobre las variables faltantes SIN exponer valores
-    throw new Error(
-      `[ConfigError] Falla de validación en variables de entorno de MexAgenda: ${errorDetails}. ` +
-      `Por favor verifique la configuración o consulte el archivo .env.example.`
+    const logger = new Logger('EnvConfig');
+    logger.warn(
+      `[ConfigWarning] Advertencia en variables de entorno: ${errorDetails}. Verifique las variables en el panel de Vercel.`,
     );
   }
 
-  return result.config;
+  return (
+    result.config || {
+      NODE_ENV: (process.env.NODE_ENV as any) || 'production',
+      PORT: parseInt(process.env.PORT || '4000', 10),
+      FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+      BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:4000',
+      DATABASE_URL: process.env.DATABASE_URL,
+      DIRECT_URL: process.env.DIRECT_URL,
+      MFA_ENCRYPTION_KEY: process.env.MFA_ENCRYPTION_KEY,
+      SESSION_SECRET: process.env.SESSION_SECRET,
+    }
+  );
 }

@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { Argon2Service } from '../../common/crypto/argon2.service';
@@ -47,6 +48,13 @@ export class AuthService {
     userAgent: string,
   ): Promise<LoginResponse & { rawSessionToken?: string }> {
     const normalizedEmail = email.toLowerCase().trim();
+
+    // 0. Verificación de configuración de base de datos
+    if (!process.env.DATABASE_URL) {
+      throw new ServiceUnavailableException(
+        'El servicio de base de datos no está configurado. Por favor agregue la variable DATABASE_URL en el panel de Vercel.',
+      );
+    }
 
     // 1. Verificación de Bloqueo por Fuerza Bruta (Rate Limiting en BD)
     await this.checkBruteForceLock(normalizedEmail, ipAddress);

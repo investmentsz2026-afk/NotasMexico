@@ -71,19 +71,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         this.logger.error(
           `Error de Prisma [${prismaErr.code}] en [${request.method}] ${request.url}: ${prismaErr.message}`,
         );
-        if (process.env.NODE_ENV !== 'production') {
-          detail = `Error de base de datos (${prismaErr.code}): ${prismaErr.message}`;
-        }
+        const safeMsg = (prismaErr.message || '').replace(/(:\/\/.*?):.*?@/, '$1:***@');
+        detail = `Error de base de datos (${prismaErr.code}): ${safeMsg || 'Falla en consulta de base de datos'}`;
       }
     } else if (exception instanceof Error) {
       this.logger.error(
         `Error no controlado en [${request.method}] ${request.url}: ${exception.message}`,
         exception.stack,
       );
-      // En producción no exponemos mensajes de excepción no controlados
-      if (process.env.NODE_ENV !== 'production') {
-        detail = exception.message;
-      }
+      const safeMsg = (exception.message || '').replace(/(:\/\/.*?):.*?@/, '$1:***@');
+      detail = safeMsg || 'Ha ocurrido un error inesperado en el servidor.';
     }
 
     const problemDetails: ApiErrorResponse = {

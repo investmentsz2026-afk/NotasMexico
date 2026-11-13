@@ -43,7 +43,21 @@ export async function apiFetch<T>(
   if (!response.ok) {
     let errorPayload: ApiErrorResponse;
     try {
-      errorPayload = await response.json();
+      const rawJson = await response.json();
+      errorPayload = {
+        type: rawJson.type || `https://mexagenda.org/errors/${response.status}`,
+        title: rawJson.title || response.statusText,
+        status: rawJson.status || response.status,
+        detail:
+          rawJson.detail ||
+          rawJson.message ||
+          rawJson.error?.message ||
+          (typeof rawJson.error === 'string' ? rawJson.error : null) ||
+          `Error en la solicitud HTTP (${response.status})`,
+        instance: rawJson.instance || endpoint,
+        timestamp: rawJson.timestamp || new Date().toISOString(),
+        invalidParams: rawJson.invalidParams,
+      };
     } catch {
       errorPayload = {
         type: `https://mexagenda.org/errors/${response.status}`,

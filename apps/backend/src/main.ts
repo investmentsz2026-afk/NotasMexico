@@ -128,8 +128,32 @@ export async function bootstrapApp(): Promise<Express> {
 
 // Export default para invocación directa como Serverless Function en Vercel
 export default async function handler(req: Request, res: Response) {
-  const server = await bootstrapApp();
-  return server(req, res);
+  try {
+    const server = await bootstrapApp();
+    if (req.url && !req.url.startsWith('/api/docs')) {
+      if (!req.url.startsWith('/api/v1')) {
+        if (req.url.startsWith('/v1/')) {
+          req.url = `/api${req.url}`;
+        } else if (req.url.startsWith('/api/')) {
+          req.url = req.url.replace(/^\/api\//, '/api/v1/');
+        } else {
+          req.url = `/api/v1${req.url.startsWith('/') ? req.url : `/${req.url}`}`;
+        }
+      }
+    }
+    return server(req, res);
+  } catch (err: any) {
+    console.error('[VercelHandlerError]', err);
+    if (!res.headersSent) {
+      return res.status(500).json({
+        type: 'https://mexagenda.org/errors/500',
+        title: 'Vercel Serverless Invocation Error',
+        status: 500,
+        detail: err?.message || 'Error durante la inicialización del backend en Vercel.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
 }
 
 // En entorno local o contenedor fuera de Vercel/Lambda, iniciar escucha TCP

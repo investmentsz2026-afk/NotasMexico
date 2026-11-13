@@ -54,8 +54,11 @@ export function sanitizeDatabaseUrl(rawUrl?: string): string | undefined {
     .replace(/\?&/, '?')
     .replace(/[?&]$/, '');
 
-  if (cleaned.includes('neon.tech') && !cleaned.includes('sslmode=')) {
-    cleaned += (cleaned.includes('?') ? '&' : '?') + 'sslmode=require';
+  if (!cleaned.includes('sslmode=')) {
+    const sslVal = process.env.sslmode || (cleaned.includes('neon.tech') ? 'require' : undefined);
+    if (sslVal) {
+      cleaned += (cleaned.includes('?') ? '&' : '?') + `sslmode=${sslVal}`;
+    }
   }
   return cleaned;
 }

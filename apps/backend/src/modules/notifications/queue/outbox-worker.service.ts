@@ -49,6 +49,12 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     this.isShuttingDown = false;
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      this.logger.log(
+        `[OutboxWorker:${this.workerId}] Entorno serverless detectado: worker outbox en sondeo continuo desactivado para prevenir bloqueos de invocación.`,
+      );
+      return;
+    }
     this.logger.log(`[OutboxWorker:${this.workerId}] Inicializando procesador de entregas asíncronas outbox...`);
     // Ejecutar un ciclo cada 10 segundos
     this.workerInterval = setInterval(() => {

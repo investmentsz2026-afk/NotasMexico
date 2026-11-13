@@ -14,7 +14,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 let cachedApp: Express | null = null;
 let nestAppInstance: INestApplication | null = null;
 
-export async function bootstrapApp(): Promise<Express> {
+async function bootstrapApp(): Promise<Express> {
   if (cachedApp) {
     return cachedApp;
   }

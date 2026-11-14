@@ -9,11 +9,11 @@
   }
 
   body {
-    background-color: #e4effb;
+    background-color: #c9d8f8;
     background-image: 
       radial-gradient(at 10% 10%, rgba(186, 230, 253, 0.45) 0px, transparent 50%),
       radial-gradient(at 90% 15%, rgba(191, 219, 254, 0.50) 0px, transparent 45%),
-      linear-gradient(180deg, #dbeafe 0%, #eaf2fd 40%, #e2edfb 100%);
+      linear-gradient(180deg, #bcd5fb 0%, #c9d8f8 45%, #d9cdf6 100%);
     background-attachment: fixed;
     color: #0f172a;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -23,7 +23,7 @@
 
 /* Efectos 3D y Glassmorphism */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(238, 244, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(186, 230, 253, 0.9);
@@ -31,7 +31,7 @@
 }
 
 .card-3d {
-  background: #ffffff;
+  background: #eef4ff;
   border: 1px solid rgba(148, 163, 184, 0.5);
   border-radius: 1rem;
   box-shadow: 

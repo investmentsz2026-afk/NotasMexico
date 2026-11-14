@@ -99,7 +99,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="w-full min-h-[calc(100vh-4rem)] bg-gradient-to-b from-[#dbeafe] via-[#eaf2fd] to-[#e2edfb] text-slate-800 relative pb-16">
+    <div className="w-full min-h-[calc(100vh-4rem)] bg-gradient-to-b from-[#bcd5fb] via-[#c9d8f8] to-[#d9cdf6] text-slate-800 relative pb-16">
       {/* Luces Ambientales Luminosas y Suaves de Fondo */}
       <div className="pointer-events-none absolute top-0 left-10 sm:left-1/4 h-80 sm:h-96 w-80 sm:w-96 rounded-full bg-white/60 blur-3xl" />
       <div className="pointer-events-none absolute top-1/3 right-4 sm:right-16 h-80 sm:h-96 w-80 sm:w-96 rounded-full bg-sky-200/50 blur-3xl" />
@@ -200,7 +200,7 @@ export default function HomePage() {
             {/* KPI 1: Reuniones (Celeste Suave / Azul Vívido Claro) */}
             <Link
               href="/meetings"
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-sky-50 to-blue-100/90 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-[0_8px_20px_-4px_rgba(37,99,235,0.18)] hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-100 via-sky-100/90 to-blue-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-[0_8px_20px_-4px_rgba(37,99,235,0.18)] hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
               <div className="relative z-10 min-w-0">
                 <div className="flex items-center justify-between sm:block">
@@ -227,7 +227,7 @@ export default function HomePage() {
             {/* KPI 2: Acuerdos (Plomo Claro / Pizarra Perla) */}
             <Link
               href="/agreements"
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50 to-slate-200/90 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-600 shadow-[0_8px_20px_-4px_rgba(51,65,85,0.18)] hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-indigo-200/90 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-600 shadow-[0_8px_20px_-4px_rgba(51,65,85,0.18)] hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
               <div className="relative z-10 min-w-0">
                 <div className="flex items-center justify-between sm:block">
@@ -254,7 +254,7 @@ export default function HomePage() {
             {/* KPI 3: Bóveda (Azul Cerúleo Claro / Cian Suave) */}
             <Link
               href="/vault"
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-cyan-50 to-sky-100/90 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-sky-600 shadow-[0_8px_20px_-4px_rgba(2,132,199,0.18)] hover:border-sky-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-100 via-cyan-100/90 to-sky-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-sky-600 shadow-[0_8px_20px_-4px_rgba(2,132,199,0.18)] hover:border-sky-500 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
               <div className="relative z-10 min-w-0">
                 <div className="flex items-center justify-between sm:block">
@@ -281,7 +281,7 @@ export default function HomePage() {
             {/* KPI 4: Anotaciones (Azul Acero Claro / Pizarra Suave) */}
             <Link
               href="/notes"
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-indigo-50/70 to-blue-100/80 p-3 sm:p-6 border-2 border-indigo-200 border-b-[5px] sm:border-b-[7px] border-b-indigo-500 shadow-[0_8px_20px_-4px_rgba(79,70,229,0.18)] hover:border-indigo-400 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-blue-200/80 p-3 sm:p-6 border-2 border-indigo-200 border-b-[5px] sm:border-b-[7px] border-b-indigo-500 shadow-[0_8px_20px_-4px_rgba(79,70,229,0.18)] hover:border-indigo-400 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
               <div className="relative z-10 min-w-0">
                 <div className="flex items-center justify-between sm:block">
@@ -311,7 +311,7 @@ export default function HomePage() {
         <div className="space-y-4 sm:space-y-5">
           <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-600 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border-2 border-sky-300 border-b-4 sm:border-b-[6px] border-b-blue-950 shadow-md text-white">
             <div className="flex items-center space-x-2.5 sm:space-x-3">
-              <div className="flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white text-blue-700 border-2 border-sky-200 border-b-4 border-b-blue-300 shadow-md">
+              <div className="flex h-9 w-9 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-sky-50 text-blue-700 border-2 border-sky-200 border-b-4 border-b-blue-300 shadow-md">
                 <Layers className="h-4 w-4 sm:h-6 sm:w-6" />
               </div>
               <div>
@@ -329,7 +329,7 @@ export default function HomePage() {
             {/* Módulo 1: Reuniones (Tarjeta Clara 3D) */}
             <Link
               href={user ? '/meetings' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-sky-50/80 to-blue-50 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-500 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-100 via-sky-100/90 to-blue-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-500 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -358,7 +358,7 @@ export default function HomePage() {
             {/* Módulo 2: Acuerdos (Tarjeta Plomo Claro 3D) */}
             <Link
               href={user ? '/agreements' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50 to-slate-100 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-indigo-200/80 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -387,7 +387,7 @@ export default function HomePage() {
             {/* Módulo 3: Bóveda Documental (Tarjeta Clara 3D) */}
             <Link
               href={user ? '/vault' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-cyan-50/80 to-sky-50 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-sky-600 shadow-md hover:border-sky-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-100 via-cyan-100/90 to-sky-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-sky-600 shadow-md hover:border-sky-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -416,7 +416,7 @@ export default function HomePage() {
             {/* Módulo 4: Anotaciones (Tarjeta Plomo Claro 3D) */}
             <Link
               href={user ? '/notes' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50 to-indigo-50/70 p-3 sm:p-6 border-2 border-indigo-200 border-b-[5px] sm:border-b-[7px] border-b-indigo-500 shadow-md hover:border-indigo-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-indigo-200/80 p-3 sm:p-6 border-2 border-indigo-200 border-b-[5px] sm:border-b-[7px] border-b-indigo-500 shadow-md hover:border-indigo-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -445,7 +445,7 @@ export default function HomePage() {
             {/* Módulo 5: Reportes y Tableros (Tarjeta Clara 3D) */}
             <Link
               href={user ? '/reports' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-sky-50/80 to-blue-50 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-100 via-sky-100/90 to-blue-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -474,7 +474,7 @@ export default function HomePage() {
             {/* Módulo 6: Calendario (Tarjeta Plomo Claro 3D) */}
             <Link
               href={user ? '/meetings/calendar' : '/login'}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50 to-slate-100 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-indigo-200/80 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1">
@@ -506,7 +506,7 @@ export default function HomePage() {
                 {/* Módulo Admin 7: Categorías (Tarjeta Clara 3D) */}
                 <Link
                   href="/meeting-categories"
-                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-sky-50/80 to-blue-50 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-100 via-sky-100/90 to-blue-200/80 p-3 sm:p-6 border-2 border-sky-300 border-b-[5px] sm:border-b-[7px] border-b-blue-600 shadow-md hover:border-blue-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
@@ -535,7 +535,7 @@ export default function HomePage() {
                 {/* Módulo Admin 8: Usuarios (Tarjeta Plomo Claro 3D) */}
                 <Link
                   href="/users"
-                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50 to-slate-100 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-100 via-indigo-100/90 to-indigo-200/80 p-3 sm:p-6 border-2 border-slate-300 border-b-[5px] sm:border-b-[7px] border-b-slate-500 shadow-md hover:border-slate-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1">
@@ -567,7 +567,7 @@ export default function HomePage() {
 
         {/* Sección Inferior: Próximas Reuniones / Sesiones Recientes (Tarjeta Clara 3D) */}
         {user && (
-          <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-sky-50/70 to-blue-50/70 p-3.5 sm:p-7 border-2 border-sky-300 border-b-[5px] sm:border-b-[8px] border-b-blue-500 shadow-lg space-y-4 sm:space-y-5 text-slate-900">
+          <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sky-100 via-sky-100/90 to-blue-200/80 p-3.5 sm:p-7 border-2 border-sky-300 border-b-[5px] sm:border-b-[8px] border-b-blue-500 shadow-lg space-y-4 sm:space-y-5 text-slate-900">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b-2 border-sky-200/80 pb-3 sm:pb-4">
               <div>
                 <h2 className="text-sm sm:text-lg font-black text-slate-900">
@@ -587,7 +587,7 @@ export default function HomePage() {
             </div>
 
             {recentMeetings.length === 0 ? (
-              <div className="py-8 text-center space-y-3 bg-white/90 rounded-2xl border-2 border-dashed border-sky-200 p-4 sm:p-6 text-slate-600">
+              <div className="py-8 text-center space-y-3 bg-sky-50/90 rounded-2xl border-2 border-dashed border-sky-200 p-4 sm:p-6 text-slate-600">
                 <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-blue-600 mx-auto" />
                 <div className="space-y-1">
                   <p className="text-xs sm:text-sm font-black text-slate-900">
@@ -611,7 +611,7 @@ export default function HomePage() {
                   <Link
                     key={m.id}
                     href={`/meetings/${m.id}`}
-                    className="group rounded-xl sm:rounded-2xl bg-white hover:bg-sky-50/60 border-2 border-slate-200 border-b-[4px] sm:border-b-[6px] border-b-slate-400 hover:border-blue-400 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 shadow-sm p-3 sm:p-5"
+                    className="group rounded-xl sm:rounded-2xl bg-sky-50 hover:bg-sky-100 border-2 border-slate-200 border-b-[4px] sm:border-b-[6px] border-b-slate-400 hover:border-blue-400 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 shadow-sm p-3 sm:p-5"
                   >
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center justify-between gap-1">
